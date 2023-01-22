@@ -4,7 +4,7 @@ _printf
 - formatted output conversion
 .SH SYNOPSIS
 .DS
-\fB#include "holberton.h"\fP
+\fB#include "main.h"\fP
 .PP
 \fBint _printf(const char *format, ...);\fP
 .DE
@@ -214,7 +214,7 @@ R      Prints the rot13'd string.
 To print a string:
 .PP
 .RS +4
-#include "holberton.h"
+#include "main.h"
 
 .RE
 .RS +4
