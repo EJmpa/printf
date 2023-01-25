@@ -1,50 +1,50 @@
 #include "main.h"
+#include <limits.h>
+#include <stdio.h>
+
 /**
- * _printf - Printf function copy
- * Description: This is a modified version of printf
- * @format: String to print
- * Return: Number of characters printed
+ * _printf - produces output according to a format
+ * @format: format string containing the characters and the specifiers
+ * Description: this function will call the get_print() function that will
+ * determine which printing function to call depending on the conversion
+ * specifiers contained into fmt
+ * Return: length of the formatted output string
  */
 int _printf(const char *format, ...)
 {
-	int how_many = 0;
-	const char *pf;
-	int (*f)();
-	char *buffer = buffer_init();
-	va_list args;
+	int (*pfunc)(va_list, flags_t *);
+	const char *p;
+	va_list arguments;
+	flags_t flags = {0, 0, 0};
 
-	va_start(args, format);
-	if (!buffer)
-		return (0);
-	if (!format || (format[0] == '%' && format[1] == '\0'))
-	{
-		free(buffer);
+	register int count = 0;
+
+	va_start(arguments, format);
+	if (!format || (format[0] == '%' && !format[1]))
 		return (-1);
-	}
-	for (pf = format; *pf; pf++)
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (p = format; *p; p++)
 	{
-		if (*pf == '%')
+		if (*p == '%')
 		{
-			f = verify_format(pf);
-			if (f)
+			p++;
+			if (*p == '%')
 			{
-				how_many += f(args, buffer);
-				pf++;
+				count += _putchar('%');
+				continue;
 			}
-			else
-			{
-				_putchar(buffer, *pf);
-				how_many++;
-			}
-		}
-		else
-		{
-			_putchar(buffer, *pf);
-			how_many++;
-		}
+			while (get_flag(*p, &flags))
+				p++;
+			pfunc = get_print(*p);
+			count += (pfunc)
+				? pfunc(arguments, &flags)
+				: _printf("%%%c", *p);
+		} else
+			count += _putchar(*p);
 	}
-	va_end(args);
-	buffer_print(buffer, buffer_pos(buffer));
-	free(buffer);
-	return (how_many);
+	_putchar(-1);
+	va_end(arguments);
+	return (count);
+
 }
